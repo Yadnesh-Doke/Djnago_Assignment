@@ -1,0 +1,25 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Subscribe {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-inner">
+    <div class="page-header">
+        <h2 class="page-title">You have subscribed successfully!</h2><br><br>
+        <h2>{{ email }}</h2><br><br>
+        <h2>{{ country }}</h2><br><br>
+    </div>
+    <hr>
+    <div class="card-action">
+        <a href="/" class="btn btn-success">Go to Dashboard</a>
+    </div>
+</div>
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+
+{% endblock javascripts %}

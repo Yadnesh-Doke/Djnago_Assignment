@@ -1,0 +1,138 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Confirmed cases {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-inner">
+    <div class="page-header">
+        <h2 class="page-title">Recovered cases over various countries</h2>
+    </div>
+    <hr>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        Distribution of Recovered cases of Cororna virus
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        Recovered cases Vs Overall cases
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="multipleBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+<script type="text/javascript">
+    var countries_cases = {{ countries | safe }};
+    for (let country in countries_cases) {
+        countries_cases[country] = JSON.parse(countries_cases[country].replace(/'/g, "\""))
+    }
+
+    country_names = [];
+    confirmed_cases = [];
+    recovered_cases = [];
+    for (let country in countries_cases) {
+        country_names.push(country)
+        recovered_cases.push(countries_cases[country].total_recovered)
+        confirmed_cases.push(countries_cases[country].total_confirmed)
+    }
+
+    barChart = document.getElementById('barChart').getContext('2d');
+    var myBarChart = new Chart(barChart, {
+        type: 'bar',
+        data: {
+            // labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            labels: country_names,
+            datasets: [{
+                label: "# of recovered",
+                backgroundColor: 'rgb(23, 125, 255)',
+                borderColor: 'rgb(23, 125, 255)',
+                // data: [3, 2, 9, 5, 4, 6, 4, 6, 7, 8, 7, 4],
+                data: recovered_cases
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+        }
+    });
+
+    multipleBarChart = document.getElementById('multipleBarChart').getContext('2d');
+    var myMultipleBarChart = new Chart(multipleBarChart, {
+			type: 'bar',
+			data: {
+                labels: country_names,
+				datasets : [{
+					label: "Total cases",
+					backgroundColor: '#59d05d',
+					borderColor: '#59d05d',
+					data: confirmed_cases,
+				},{
+					label: "Recovered",
+					backgroundColor: '#fdaf4b',
+					borderColor: '#fdaf4b',
+                    data: recovered_cases
+				}],
+			},
+			options: {
+				responsive: true, 
+				maintainAspectRatio: false,
+				legend: {
+					position : 'bottom'
+				},
+				title: {
+					display: true,
+					text: 'Recovery stats'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false
+				},
+				responsive: true,
+				scales: {
+					xAxes: [{
+						stacked: true,
+					}],
+					yAxes: [{
+						stacked: true
+					}]
+				}
+			}
+		});
+
+</script>
+
+{% endblock javascripts %}

@@ -1,0 +1,218 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Confirmed cases {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<div class="page-inner">
+    <div class="page-header">
+        <h2 class="page-title">Confirmed cases over countries</h2>
+    </div>
+    <hr>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        Distribution of confirmed cases of Cororna virus across various countries
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="statisticsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        Select a country to see it's confirmed cases
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <select class="form-control" name="txtforcountry" id="txtforcountry">
+                            {% for key in countries %}
+                            <option value="{{key}}">{{ key }}</option>
+                            {% endfor %}
+                        </select>
+                        <br>
+                        <div>
+                            <button class="btn btn-success pull-right" type="button"
+                                onclick="showChart()">Submit</button>
+                            <br>
+                        </div>
+                    </form>
+                    <div class="card-header">
+                        <div class="card-title">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="selectedCountry"></canvas>
+                        </div>
+                        <h4 class="fw-bold text-white">Confirmed cases : <span id="confirmed"></span></h4>
+                        <h4 class="fw-bold text-white">Recovered cases : <span id="recovered"></span></h4>
+                        <h4 class="fw-bold text-white">Death cases : <span id="deaths"></span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}
+<script type="text/javascript">
+    var countries_cases = {{ countries | safe }};
+    // countries_cases = JSON.stringify(countries_cases);
+    // countries_cases = JSON.parse(countries_cases);
+    // countries_cases = JSON.parse(countries_cases.replace(/'/g,"\""));
+    // countries_cases = JSON.parse(countries_cases);   
+    // alert(typeof(countries_cases))
+    // alert(typeof(countries_cases.Russia));
+
+    for (let country in countries_cases) {
+        // console.log(country+":"+countries_cases[country])
+        countries_cases[country] = JSON.parse(countries_cases[country].replace(/'/g, "\""))
+        // console.log(typeof(c1))
+        // c2 = JSON.parse(c1)
+        // console.log("c2 type: "+typeof(c2))
+    }
+
+    // for(let country in countries_cases){
+    //     console.log("type: "+typeof(countries_cases[country]))
+    // }
+
+    country_names = [];
+    confirmed_cases = [];
+    for (let country in countries_cases) {
+        country_names.push(country)
+        confirmed_cases.push(countries_cases[country].total_confirmed)
+    }
+
+    // country_names = [];
+    // for(let i=0; i<countries_cases.length; i++){
+    //     country_names.push(countries_cases[i].country_name)
+    // }
+    // alert(country_names.toString());
+    // confirmed_cases = [];
+    // for(let i=0; i<countries_cases.length; i++){
+    //     confirmed_cases.push(country_cases[i].cases.total_confirmed)
+    // }
+
+    var ctx = document.getElementById('statisticsChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            // labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: country_names,
+            datasets: [{
+                label: '# of cases',
+                // data: [12, 19, 3, 5, 2, 3],
+                data: confirmed_cases,
+                backgroundColor: "#177dff",
+                borderColor: "#177dff",
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            tooltips: {
+                bodySpacing: 4,
+                mode: "nearest",
+                intersect: 0,
+                position: "nearest",
+                xPadding: 10,
+                yPadding: 10,
+                caretPadding: 10
+            },
+
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        fontStyle: "500",
+                        beginAtZero: true,
+                        maxTicksLimit: 5,
+                    },
+
+                }],
+
+            }
+        }
+    });
+
+    var countrySelected = document.getElementById("txtforcountry").value;
+    drawPieChart();
+
+    function showChart() {
+        countrySelected = document.getElementById("txtforcountry").value;
+        drawPieChart();
+    }
+
+    // countrySelected = document.getElementById("txtforcountry").value
+    function drawPieChart() {
+        var ctx = document.getElementById('selectedCountry').getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [countries_cases[countrySelected].total_confirmed,
+                    countries_cases[countrySelected].total_recovered,
+                    countries_cases[countrySelected].total_deaths
+                    ],
+
+                    backgroundColor: ["#1d7af3", "#fdaf4b", "#f3545d"],
+                    borderWidth: 0
+                }],
+                labels: ['Confirmed', 'Recovered', 'Deaths']
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        fontColor: 'rgb(154, 154, 154)',
+                        fontSize: 13,
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                },
+                pieceLabel: {
+                    render: 'percentage',
+                    fontColor: 'white',
+                    fontSize: 14,
+                },
+                tooltips: true,
+                layout: {
+                    padding: {
+                        left: 20,
+                        right: 20,
+                        top: 20,
+                        bottom: 20
+                    }
+                }
+            }
+        });
+        total = countries_cases[countrySelected].total_confirmed
+            + countries_cases[countrySelected].total_recovered
+            + countries_cases[countrySelected].total_deaths;
+        document.getElementById("confirmed").innerHTML = countries_cases[countrySelected].total_confirmed + " (" + Math.round((countries_cases[countrySelected].total_confirmed / total) * 100) + " %) of total";
+        document.getElementById("recovered").innerHTML = countries_cases[countrySelected].total_recovered + " (" + Math.round((countries_cases[countrySelected].total_recovered / total) * 100) + " %) of total";
+        document.getElementById("deaths").innerHTML = countries_cases[countrySelected].total_deaths + " (" + Math.round((countries_cases[countrySelected].total_deaths / total) * 100) + " %) of total";
+    }
+
+
+</script>
+{% endblock javascripts %}
