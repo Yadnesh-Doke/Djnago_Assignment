@@ -195,7 +195,7 @@ def index(request):
 @login_required(login_url="/login/")
 def pages(request):
     context = {}
-    countries = Country.objects.all()[:7]
+    countries = Country.objects.all()
     # countries = list(Country.objects.all().values()[:8])
     # countries_json = dumps(countries, cls=DjangoJSONEncoder)
     # print("COUNTRIES JSON")

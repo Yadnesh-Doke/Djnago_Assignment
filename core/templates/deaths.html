@@ -58,7 +58,12 @@
     country_names = [];
     confirmed_cases = [];
     death_cases = [];
+    let i = 0;
     for (let country in countries_cases) {
+        i = i+1;
+        if(i === 10){
+            break;
+        }
         country_names.push(country)
         death_cases.push(countries_cases[country].total_deaths)
         confirmed_cases.push(countries_cases[country].total_confirmed)
