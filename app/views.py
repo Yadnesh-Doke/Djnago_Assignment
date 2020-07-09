@@ -124,9 +124,8 @@ def index(request):
     # print(cases)
     cases.save()
 
-    countries1 = ["USA","brazil","russia","india","mexico","pakistan"]
-    countries2 = ["UK","spain","peru","chile","italy","iran","turkey","saudi arabia","germany"]
-    # countries3 = ["peru","chile","italy","iran","turkey","saudi arabia","germany"]
+    countries1 = ["USA","brazil","india","russia","peru","chile","mexico","iran","italy","pakistan","south africa","saudi arabia","turkey","germany"]
+    countries2 = ["UK","spain"]
 
     Country.objects.all().delete()
 
@@ -155,7 +154,11 @@ def index(request):
 
     for country in countries2:
         country_cases = requests.get("https://api.covid19api.com/total/country/" + country)
-        country_cases = country_cases.json()[-1]
+        country_cases = country_cases.json()
+        print("COUNTRY_CASES: ", type(country_cases))
+        print(country_cases)
+        country_cases = country_cases[-2]
+        print(country_cases)
         cases_obj = Cases(
                           total_confirmed = int(country_cases["Confirmed"]),
                           total_recovered = int(country_cases["Recovered"]),
