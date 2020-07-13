@@ -74,24 +74,11 @@
 {% block javascripts %}
 <script type="text/javascript">
     var countries_cases = {{ countries | safe }};
-    // countries_cases = JSON.stringify(countries_cases);
-    // countries_cases = JSON.parse(countries_cases);
-    // countries_cases = JSON.parse(countries_cases.replace(/'/g,"\""));
-    // countries_cases = JSON.parse(countries_cases);   
-    // alert(typeof(countries_cases))
-    // alert(typeof(countries_cases.Russia));
 
     for (let country in countries_cases) {
-        // console.log(country+":"+countries_cases[country])
         countries_cases[country] = JSON.parse(countries_cases[country].replace(/'/g, "\""))
-        // console.log(typeof(c1))
-        // c2 = JSON.parse(c1)
-        // console.log("c2 type: "+typeof(c2))
     }
 
-    // for(let country in countries_cases){
-    //     console.log("type: "+typeof(countries_cases[country]))
-    // }
 
     country_names = [];
     confirmed_cases = [];
@@ -105,25 +92,13 @@
         confirmed_cases.push(countries_cases[country].total_confirmed)
     }
 
-    // country_names = [];
-    // for(let i=0; i<countries_cases.length; i++){
-    //     country_names.push(countries_cases[i].country_name)
-    // }
-    // alert(country_names.toString());
-    // confirmed_cases = [];
-    // for(let i=0; i<countries_cases.length; i++){
-    //     confirmed_cases.push(country_cases[i].cases.total_confirmed)
-    // }
-
     var ctx = document.getElementById('statisticsChart').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            // labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
             labels: country_names,
             datasets: [{
                 label: '# of cases',
-                // data: [12, 19, 3, 5, 2, 3],
                 data: confirmed_cases,
                 backgroundColor: "#177dff",
                 borderColor: "#177dff",
